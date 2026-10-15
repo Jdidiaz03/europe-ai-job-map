@@ -34,14 +34,13 @@ In September 2026, 15% of job postings in Ireland mentioned AI, up from 4.3% in 
 Needs Python 3 only. The raw data is not in this repo.
 
 ```
-# 1. Indeed data: download AI_posting.csv and aggregate_job_postings_<CC>.csv
-#    from the two Hiring Lab repos above into data/
-# 2. LinkedIn sample (needs an Apify token in the macOS Keychain, service "apify-api")
-python3 build/fetch_linkedin.py
-# 3. Count employers, then inline everything into index.html
-python3 build/companies.py
-python3 build/build.py
+python3 build/indeed.py          # 1. download the Indeed CSVs into data/, write build/data.json (free)
+python3 build/fetch_linkedin.py  # 2. LinkedIn sample (needs an Apify token in the macOS Keychain, service "apify-api")
+python3 build/companies.py       # 3. count employers, industries, role types
+python3 build/build.py           # 4. inline everything into index.html
 ```
+
+Or all four at once: `python3 build/monthly.py`. It skips the LinkedIn step if this month's snapshot exists or Apify credit is low, and writes a before/after table of the numbers the page text quotes to `data/monthly/<YYYY-MM>.md`. It does not push: the text is updated by hand first. On my Mac, `run.sh` is called every morning by a launchd job and does real work once a month, from the 5th.
 
 `index.src.html` is the page source. `build/build.py` writes `index.html`, a single file with the data inlined. D3 and TopoJSON load from cdnjs.
 
