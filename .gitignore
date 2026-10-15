@@ -1,0 +1,6 @@
+# Raw downloads stay local: LinkedIn scrapes hold full job descriptions,
+# and the Indeed CSVs can be re-downloaded (see README).
+data/
+build/countries-50m.json
+__pycache__/
+.DS_Store

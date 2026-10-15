@@ -1,0 +1,495 @@
+<title>Europe's AI Job Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="How the share of European job postings that mention AI changed from 2019 to 2026, by country. Data: Indeed Hiring Lab.">
+<meta property="og:title" content="AI jobs grew while Europe's job market shrank">
+<meta property="og:description" content="Share of job postings that mention AI in 7 European countries, 2019 to 2026, and the employers hiring for AI roles. By Julian Diaz.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jdidiaz03.github.io/europe-ai-job-map/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~66ch) like a working paper; figures break out wider; notes sit in the right margin on wide screens. */
+:root {
+  --paper: #f5f6f4;
+  --ink: #15181c;
+  --ink-2: #474d55;
+  --ink-3: #7d838b;
+  --rule: #d9dcdf;
+  --land: #e4e6e3;
+  --land-edge: #f5f6f4;
+  --seq-lo: #dfe8f0;
+  --seq-hi: #0f3a66;
+  --accent: #c0362c;
+
+  --serif: "Source Serif 4", "Iowan Old Style", Charter, Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111417; --ink: #e6e8ea; --ink-2: #aab0b7; --ink-3: #757c84; --rule: #2a2f35;
+    --land: #1d2227; --land-edge: #111417; --seq-lo: #1e2a36; --seq-hi: #9fd0f7; --accent: #ff6a5c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111417; --ink: #e6e8ea; --ink-2: #aab0b7; --ink-3: #757c84; --rule: #2a2f35;
+  --land: #1d2227; --land-edge: #111417; --seq-lo: #1e2a36; --seq-hi: #9fd0f7; --accent: #ff6a5c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 18px/1.6 var(--serif);
+  font-optical-sizing: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 56px 80px;
+}
+.page { max-width: 1060px; margin: 0 auto; display: grid; gap: 56px; }
+.col { max-width: 660px; }
+.with-note { display: grid; grid-template-columns: minmax(0, 660px) minmax(0, 300px); gap: 48px; align-items: start; }
+.note { font: 400 14px/1.5 var(--serif); color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 10px; }
+.note b { font-weight: 600; color: var(--ink); }
+
+.eyebrow, .fig-no, .tick, .mono { font-family: var(--mono); }
+.eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 18px; }
+h1 { font-weight: 400; font-size: clamp(34px, 5.6vw, 54px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 22px; text-wrap: balance; max-width: 16ch; }
+h2 { font-weight: 600; font-size: 22px; line-height: 1.3; margin: 0 0 10px; text-wrap: balance; }
+p { margin: 0 0 14px; }
+.lede { font-size: 21px; line-height: 1.5; color: var(--ink); }
+.byline { font: 400 13px/1.4 var(--mono); color: var(--ink-3); }
+.num { font-family: var(--mono); font-size: 0.86em; font-variant-numeric: tabular-nums; }
+.hl { color: var(--accent); }
+a { color: inherit; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
+
+figure { margin: 0; }
+.fig-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; margin-bottom: 14px; }
+.fig-no { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.fig-title { font-size: 17px; font-style: italic; color: var(--ink-2); }
+figcaption { font-size: 14px; line-height: 1.5; color: var(--ink-3); max-width: 660px; margin-top: 12px; }
+
+/* Fig. 1 map */
+.map-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 32px; align-items: start; }
+#map { width: 100%; height: auto; display: block; }
+#map .country { stroke: var(--land-edge); stroke-width: 0.6; }
+#map .clabel { font: 500 12px/1 var(--mono); pointer-events: none; }
+#map .clabel .v { font-size: 15px; }
+#map .city circle { fill: var(--accent); fill-opacity: 0.85; stroke: var(--paper); stroke-width: 1.2; }
+#map .city text { font: 500 11.5px/1 var(--mono); fill: var(--accent); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; }
+#map.hide-apps .city { display: none; }
+
+.readout { display: grid; gap: 14px; }
+.month { font: 500 30px/1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.month-sub { font: 400 13px/1.4 var(--serif); color: var(--ink-3); }
+.rank { width: 100%; border-collapse: collapse; font: 400 13px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.rank th { text-align: right; font-weight: 400; color: var(--ink-3); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 0 0 8px; border-bottom: 1px solid var(--rule); }
+.rank th:first-child, .rank td:first-child { text-align: left; }
+.rank td { text-align: right; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+.rank td .bar { display: inline-block; height: 6px; background: var(--ink-3); vertical-align: middle; margin-right: 8px; }
+.rank tr.top td { color: var(--accent); }
+.rank tr.top .bar { background: var(--accent); }
+.key { display: grid; gap: 4px; }
+.key-bar { height: 8px; border-radius: 1px; }
+.key-ticks { display: flex; justify-content: space-between; font: 400 11px/1 var(--mono); color: var(--ink-3); }
+
+.controls { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; margin-top: 18px; }
+button {
+  font: 500 13px/1 var(--mono); color: var(--paper); background: var(--ink);
+  border: 0; border-radius: 3px; padding: 10px 14px; cursor: pointer; min-width: 82px;
+}
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.slider { position: relative; padding-bottom: 22px; }
+input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
+.mark { position: absolute; bottom: 0; transform: translateX(-50%); font: 400 11px/1 var(--mono); color: var(--ink-3); white-space: nowrap; }
+.mark::before { content: ""; position: absolute; left: 50%; bottom: 14px; height: 8px; border-left: 1px solid var(--ink-3); }
+.mark.end-l { transform: none; } .mark.end-l::before { left: 4px; }
+.mark.end-r { transform: translateX(-100%); } .mark.end-r::before { left: auto; right: 4px; }
+.toggle { display: inline-flex; gap: 8px; align-items: center; font: 400 13px/1.3 var(--mono); color: var(--ink-2); margin-top: 6px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+
+/* Fig. 2 small multiples */
+.multiples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 32px; }
+.multiples figure svg { width: 100%; height: auto; display: block; overflow: visible; }
+.sm-name { font: 600 15px/1.2 var(--serif); }
+.sm-name .num { font-weight: 400; color: var(--ink-3); margin-left: 6px; }
+.sm .line { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+.sm .area { fill: var(--seq-lo); }
+.sm .marker { stroke: var(--ink-3); stroke-width: 0.6; stroke-dasharray: 2 3; }
+.sm .tick { font-size: 10.5px; fill: var(--ink-3); }
+.sm .end { fill: var(--ink); }
+.sm .end-lbl { font: 500 12px/1 var(--mono); fill: var(--ink); }
+.sm.focal .end { fill: var(--accent); }
+.sm.focal .end-lbl { fill: var(--accent); }
+
+/* Fig. 3 table */
+.table-wrap { overflow-x: auto; }
+table.est { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.3 var(--mono); font-variant-numeric: tabular-nums; }
+.est th { font-weight: 400; color: var(--ink-3); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; text-align: right; padding: 0 10px 10px; border-bottom: 1px solid var(--ink-2); vertical-align: bottom; }
+.est td { text-align: right; padding: 10px; border-bottom: 1px solid var(--rule); }
+.est th:first-child, .est td:first-child { text-align: left; padding-left: 0; font-family: var(--serif); font-size: 15px; }
+.est td.spark-cell { text-align: center; }
+.est td.big { font-weight: 500; color: var(--ink); }
+.est tr.top td.big { color: var(--accent); }
+.est .muted { color: var(--ink-3); }
+.spark { display: inline-block; vertical-align: middle; }
+.spark polyline { fill: none; stroke: var(--ink-2); stroke-width: 1; }
+.spark circle { fill: var(--ink); }
+
+/* Fig. 4 matrix */
+table.matrix { border-collapse: collapse; width: 100%; min-width: 640px; font: 400 14px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.matrix th { font-weight: 400; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); padding: 0 6px 10px; text-align: center; border-bottom: 1px solid var(--ink-2); }
+.matrix th:first-child, .matrix td:first-child { text-align: left; padding-left: 0; }
+.matrix td { text-align: center; padding: 0; height: 32px; border-bottom: 1px solid var(--paper); }
+.matrix td:first-child { font: 400 15px/1.2 var(--serif); padding-right: 12px; border-bottom-color: var(--rule); }
+.matrix td.total { text-align: right; color: var(--ink-2); padding-right: 0; border-bottom-color: var(--rule); }
+.matrix td.zero { color: var(--ink-3); }
+.matrix tr.focal td:first-child, .matrix tr.focal td.total { color: var(--accent); font-weight: 600; }
+
+/* Fig. 5 top employers */
+.tops { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; }
+.top-panel { min-width: 0; }
+.top-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--rule); padding-bottom: 6px; margin-bottom: 8px; }
+.top-head b { font: 600 15px/1.2 var(--serif); }
+.top-head span { font: 400 11px/1.2 var(--mono); color: var(--ink-3); white-space: nowrap; }
+.top-row { display: grid; grid-template-columns: minmax(0, 1fr) 64px 24px; gap: 8px; align-items: center; font: 400 13.5px/1.25 var(--serif); padding: 3px 0; }
+.top-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-row .track { height: 5px; }
+.top-row .fill { height: 100%; background: var(--ink-3); }
+.top-row .n { font: 400 12.5px/1 var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.top-row.focal .name, .top-row.focal .n { color: var(--accent); }
+.top-row.focal .fill { background: var(--accent); }
+
+.method { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.method h2 { font-size: 15px; font-family: var(--mono); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.method ol { padding-left: 20px; margin: 0; display: grid; gap: 8px; }
+.method .credit { margin-top: 24px; font: 400 13px/1.5 var(--mono); color: var(--ink-3); }
+
+@media (max-width: 900px) {
+  .with-note, .map-wrap { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .multiples { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tops { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  body { font-size: 17px; padding-block: 36px 56px; }
+  .lede { font-size: 19px; }
+  .multiples, .tops { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<main class="page">
+  <header class="with-note">
+    <div class="col">
+      <p class="eyebrow">Labour market note · October 2026</p>
+      <h1>AI jobs grew while Europe's job market shrank</h1>
+      <p class="lede">In September 2026, <span class="num">15.0%</span> of job postings in Ireland mentioned AI. In November 2022, the month ChatGPT launched, the figure was <span class="num">4.3%</span>. The UK went from <span class="num">2.3%</span> to <span class="num">9.8%</span>. Over the same period, total UK postings fell by more than half.</p>
+      <p class="byline">Julian Diaz · Data: Indeed Hiring Lab, Jan 2019 to Sep 2026</p>
+    </div>
+    <aside class="note">
+      <b>Why I made this.</b> I am applying for AI implementation roles in Madrid, London and Dublin. I wanted to check whether the demand I see in my own search shows up in the wider market. The <span class="hl">red dots</span> on the map are the <span class="num">96</span> European roles my job scout has tracked since 30 September 2026.
+    </aside>
+  </header>
+
+  <figure>
+    <div class="fig-head"><span class="fig-no">Fig. 1</span><span class="fig-title">Share of job postings that mention AI, by month</span></div>
+    <div class="map-wrap">
+      <svg id="map" viewBox="0 0 960 780" role="img" aria-labelledby="map-desc"><desc id="map-desc">Map of western Europe. Countries are shaded by the share of job postings that mention AI in the selected month.</desc></svg>
+      <div class="readout">
+        <div>
+          <div class="month" id="month">Sep 2026</div>
+          <div class="month-sub" id="month-sub">Latest month in the data</div>
+        </div>
+        <table class="rank" aria-live="polite">
+          <thead><tr><th>Country</th><th>AI share</th></tr></thead>
+          <tbody id="rank"></tbody>
+        </table>
+        <div class="key" aria-hidden="true">
+          <div class="key-bar" id="key-bar"></div>
+          <div class="key-ticks"><span>0%</span><span>4%</span><span>8%</span><span>12%</span><span>16%</span></div>
+        </div>
+        <label class="toggle" for="apps"><input type="checkbox" id="apps" checked> <span class="dot"></span> Roles in my job tracker</label>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="play" type="button">Play</button>
+      <div class="slider">
+        <input type="range" id="t" min="0" max="92" value="92" aria-label="Month">
+        <span class="mark end-l" style="left:0">2019</span>
+        <span class="mark" id="mark-gpt">ChatGPT · Nov 2022</span>
+        <span class="mark end-r" style="left:100%">Sep 2026</span>
+      </div>
+    </div>
+    <figcaption>Spain is shaded grey because Indeed does not publish an AI share for it. Its total postings are <span class="num">145</span> on an index where February 2020 = 100, the highest of the seven countries here. Figures are monthly averages of a seven-day trailing average.</figcaption>
+  </figure>
+
+  <section class="with-note">
+    <div class="col">
+      <h2>The rise starts at the end of 2022 in every country</h2>
+      <p>Before November 2022 the AI share stayed under <span class="num">4.3%</span> in five of the six countries. Ireland ran higher, peaking at <span class="num">6.9%</span>. After ChatGPT it climbs in all six. Ireland and the UK moved furthest. The Netherlands and France moved least.</p>
+    </div>
+    <aside class="note"><b>What counts as an AI posting.</b> Indeed counts a posting if it uses terms such as "machine learning", "data science" or "artificial intelligence". A sales role that mentions AI tools counts too, so this measures demand for AI skills, not only AI engineering jobs.</aside>
+  </section>
+
+  <figure>
+    <div class="fig-head"><span class="fig-no">Fig. 2</span><span class="fig-title">AI share of postings, Jan 2019 to Sep 2026. Same scale in every panel.</span></div>
+    <div class="multiples" id="multiples"></div>
+    <figcaption>The dotted line marks November 2022. Countries are sorted by their latest value.</figcaption>
+  </figure>
+
+  <section class="with-note">
+    <div class="col">
+      <h2>Fewer jobs overall, more AI jobs</h2>
+      <p>A higher share could simply mean the rest of the market shrank. So I multiplied each country's AI share by its total-postings index. That gives a rough index of the number of AI postings. In the UK, total postings fell by <span class="num">56%</span> since November 2022, yet AI postings roughly <span class="hl">doubled</span>. In Italy and the Netherlands the AI share rose only enough to offset a shrinking market.</p>
+    </div>
+    <aside class="note"><b>How rough is the estimate?</b> The share and the index come from the same Indeed postings, so the product is consistent. It is still an estimate: the index is seasonally adjusted and the share is not. Read the last column as a direction and a size, not an exact count.</aside>
+  </section>
+
+  <figure>
+    <div class="fig-head"><span class="fig-no">Fig. 3</span><span class="fig-title">November 2022 compared with September 2026</span></div>
+    <div class="table-wrap">
+      <table class="est">
+        <thead><tr>
+          <th>Country</th><th>AI share<br>Nov 2022</th><th>AI share<br>Sep 2026</th><th>All postings<br>Feb 2020 = 100</th><th>All postings<br>Feb 2020 to Sep 2026</th><th>AI postings<br>est. change</th>
+        </tr></thead>
+        <tbody id="est"></tbody>
+      </table>
+    </div>
+  </figure>
+
+  <section class="with-note">
+    <div class="col">
+      <h2>Who is hiring: consulting firms lead</h2>
+      <p>To see which employers are behind these numbers, I collected <span class="num">5,001</span> AI job postings from LinkedIn, published in the month to 15 October 2026, about 700 per country. After removing recruitment agencies and reposts of the same role, <span class="num">4,184</span> distinct roles were left.</p>
+      <p><span class="hl">Accenture</span> is the only employer with AI roles open in all seven countries and the most roles overall, <span class="num">108</span>. EY and Deloitte follow. Consulting and IT services firms posted between <span class="num">19%</span> of AI roles in the UK and <span class="num">39%</span> in Italy. In the UK and Ireland, banks and tech companies such as JPMorganChase, Cohere and Fin make up more of the list.</p>
+    </div>
+    <aside class="note"><b>Why distinct roles.</b> Many firms post one role once per city. adesso posted 4 roles 65 times in Germany. Counting raw postings would rank firms by how often they repost, so a title at an employer counts once.</aside>
+  </section>
+
+  <figure>
+    <div class="fig-head"><span class="fig-no">Fig. 4</span><span class="fig-title">Employers with AI roles open in the most countries. Distinct roles, month to 15 Oct 2026.</span></div>
+    <div class="table-wrap">
+      <table class="matrix">
+        <thead><tr id="matrix-head"></tr></thead>
+        <tbody id="matrix"></tbody>
+      </table>
+    </div>
+    <figcaption>Countries are ordered by AI share of postings, highest first. A dot means no AI role in the sample. Each country's sample is about 700 postings, so read counts across a row as a rough comparison.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-head"><span class="fig-no">Fig. 5</span><span class="fig-title">Top six AI employers in each country. Same scale in every panel.</span></div>
+    <div class="tops" id="tops"></div>
+    <figcaption>The share under each country is the part of its AI roles posted by consulting and IT services firms, from LinkedIn's industry tag. This is the first monthly snapshot. From November the page will show which employers are adding roles.</figcaption>
+  </figure>
+
+  <section class="col method">
+    <h2>Method and sources</h2>
+    <ol>
+      <li>AI share: Indeed Hiring Lab, <a href="https://github.com/hiring-lab/ai-tracker" target="_blank" rel="noopener">AI Tracker</a>, daily data to 30 September 2026, averaged by month. Indeed publishes it for six European countries.</li>
+      <li>Total postings: Indeed Hiring Lab, <a href="https://github.com/hiring-lab/job_postings_tracker" target="_blank" rel="noopener">Job Postings Tracker</a>, seasonally adjusted, February 2020 = 100.</li>
+      <li>My tracked roles: 105 postings logged by my job scout between 30 September and 15 October 2026, 96 of them in Europe. They are filtered for fit with my profile, so they show where I am looking, not the market.</li>
+      <li>Employers: public LinkedIn job search, collected with an Apify scraper on 15 October 2026. One search for "artificial intelligence" per country, posted in the past month, up to 700 results. Germany, France and Italy also got a search in their own language. Results are a sample: LinkedIn caps each search, so these are not complete counts.</li>
+      <li>116 postings from recruitment agencies and job boards were removed, since they hide the real employer. Country branches of one firm (Accenture Italia, Accenture España) count as one employer. Separate brands such as Sogeti stay separate. Only employer names and counts are shown, not the listings.</li>
+      <li>Both Indeed datasets are licensed under CC BY 4.0. Map outlines: Natural Earth via world-atlas.</li>
+    </ol>
+    <p class="credit">Code and method: <a href="https://github.com/Jdidiaz03/europe-ai-job-map" target="_blank" rel="noopener">github.com/Jdidiaz03/europe-ai-job-map</a>. Made by <a href="https://www.linkedin.com/in/julian-diaz1" target="_blank" rel="noopener">Julian Diaz</a> with Claude Code.</p>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+const TOPO = /*__TOPO__*/null;
+const D = /*__DATA__*/null;
+const CO = /*__COMP__*/null;
+
+const CODES = { "826": "GB", "372": "IE", "276": "DE", "250": "FR", "380": "IT", "528": "NL", "724": "ES" };
+const NAMES = { GB: "UK", IE: "Ireland", DE: "Germany", FR: "France", IT: "Italy", NL: "Netherlands", ES: "Spain" };
+// Hand-placed label anchors [lon, lat] so labels clear the city dots and small coastlines.
+const LABEL_AT = { IE: [-8.4, 52.15], GB: [-2.2, 54.4], DE: [10.3, 51.0], FR: [2.4, 46.5], IT: [12.6, 42.6], NL: [4.2, 54.25], ES: [-4.6, 38.6] };
+const CITIES = [
+  { name: "Madrid", n: 47, at: [-3.70, 40.42] },
+  { name: "London", n: 19, at: [-0.13, 51.51] },
+  { name: "Dublin", n: 17, at: [-6.26, 53.35] },
+  { name: "Barcelona", n: 9, at: [2.17, 41.39] },
+  { name: "Paris", n: 2, at: [2.35, 48.86] },
+  { name: "Berlin", n: 1, at: [13.40, 52.52] },
+  { name: "Zurich", n: 1, at: [8.54, 47.37] },
+];
+const AI = D.ai, MONTHS = D.months, LAST = MONTHS.length - 1, GPT = MONTHS.indexOf("2022-11");
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const fmtMonth = (m) => { const [y, mo] = m.split("-"); return `${MON[+mo - 1]} ${y}`; };
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+let t = LAST, color;
+function makeScale() { color = d3.scaleSequential(d3.interpolateLab(css("--seq-lo"), css("--seq-hi"))).domain([0, 16]); }
+function inkFor(fill) { return d3.lab(fill).l > 58 ? "#15181c" : "#f5f6f4"; }
+
+/* ---------- Fig. 1 map ---------- */
+const W = 960, H = 780;
+const svg = d3.select("#map");
+const features = topojson.feature(TOPO, TOPO.objects.countries).features;
+// Points, not a polygon: d3 reads polygon winding spherically and a rectangle can become "the whole globe minus Europe".
+const frame = { type: "MultiPoint", coordinates: [[-12.5, 35.5], [4, 35.5], [20.5, 35.5], [20.5, 59.8], [4, 59.8], [-12.5, 59.8]] };
+const proj = d3.geoConicConformal().parallels([40, 58]).rotate([-4, 0]).fitExtent([[0, 0], [W, H]], frame).clipExtent([[0, 0], [W, H]]);
+const path = d3.geoPath(proj);
+
+const gLand = svg.append("g");
+const countryPaths = gLand.selectAll("path").data(features).join("path")
+  .attr("class", "country").attr("d", path);
+countryPaths.append("title");
+
+const gLabels = svg.append("g");
+const labels = gLabels.selectAll("text").data(Object.keys(LABEL_AT)).join("text")
+  .attr("class", "clabel").attr("text-anchor", "middle")
+  .attr("transform", (c) => `translate(${proj(LABEL_AT[c])})`);
+labels.append("tspan").attr("class", "n").attr("x", 0).attr("dy", 0).text((c) => NAMES[c]);
+labels.append("tspan").attr("class", "v").attr("x", 0).attr("dy", 17);
+
+const gCities = svg.append("g");
+const r = (n) => 2.6 * Math.sqrt(n); // circle area proportional to count
+const cities = gCities.selectAll("g").data(CITIES).join("g").attr("class", "city")
+  .attr("transform", (d) => `translate(${proj(d.at)})`);
+cities.append("circle").attr("r", (d) => r(d.n)).append("title").text((d) => `${d.name}: ${d.n} role${d.n > 1 ? "s" : ""} tracked`);
+cities.filter((d) => d.n >= 5).append("text")
+  .attr("x", (d) => r(d.n) + 5).attr("y", 4).text((d) => `${d.name} ${d.n}`);
+
+function drawMap() {
+  countryPaths.attr("fill", (f) => {
+    const c = CODES[f.id];
+    return c && AI[c] ? color(AI[c][t]) : css("--land");
+  });
+  countryPaths.select("title").text((f) => {
+    const c = CODES[f.id];
+    if (c && AI[c]) return `${NAMES[c]}: ${AI[c][t].toFixed(1)}% of postings mention AI (${fmtMonth(MONTHS[t])})`;
+    if (c === "ES") return "Spain: no AI share published";
+    return f.properties.name;
+  });
+  labels.attr("fill", (c) => AI[c] ? inkFor(color(AI[c][t])) : css("--ink-2"));
+  labels.select(".v").text((c) => AI[c] ? AI[c][t].toFixed(1) + "%" : "no data");
+  labels.filter((c) => c === "NL").attr("fill", css("--ink"));
+
+  document.getElementById("month").textContent = fmtMonth(MONTHS[t]);
+  document.getElementById("month-sub").textContent =
+    t === LAST ? "Latest month in the data" : t < GPT ? "Before ChatGPT" : t === GPT ? "ChatGPT launches" : `${t - GPT} months after ChatGPT`;
+
+  const rows = Object.keys(AI).map((c) => [c, AI[c][t]]).sort((a, b) => b[1] - a[1]);
+  document.getElementById("rank").innerHTML = rows.map(([c, v], i) =>
+    `<tr class="${i === 0 ? "top" : ""}"><td>${NAMES[c]}</td><td><span class="bar" style="width:${(v / 16 * 90).toFixed(1)}px"></span>${v.toFixed(1)}%</td></tr>`).join("");
+}
+
+function drawKey() {
+  const stops = d3.range(0, 1.01, 0.1).map((p) => color(p * 16)).join(",");
+  document.getElementById("key-bar").style.background = `linear-gradient(to right, ${stops})`;
+}
+
+/* ---------- controls ---------- */
+const slider = document.getElementById("t");
+document.getElementById("mark-gpt").style.left = (GPT / LAST * 100) + "%";
+slider.addEventListener("input", () => { stop(); t = +slider.value; drawMap(); });
+document.getElementById("apps").addEventListener("change", (e) => svg.classed("hide-apps", !e.target.checked));
+let timer = null;
+const playBtn = document.getElementById("play");
+function stop() { if (timer) { clearInterval(timer); timer = null; playBtn.textContent = "Play"; } }
+playBtn.addEventListener("click", () => {
+  if (timer) return stop();
+  if (t >= LAST) t = 0;
+  playBtn.textContent = "Pause";
+  const step = matchMedia("(prefers-reduced-motion: reduce)").matches ? 6 : 1;
+  timer = setInterval(() => {
+    t = Math.min(LAST, t + step); slider.value = t; drawMap();
+    if (t >= LAST) stop();
+  }, 110 * step);
+});
+
+/* ---------- Fig. 2 small multiples ---------- */
+function drawMultiples() {
+  const order = Object.keys(AI).sort((a, b) => AI[b][LAST] - AI[a][LAST]);
+  const w = 300, h = 150, m = { l: 30, r: 46, t: 10, b: 20 };
+  const x = d3.scaleLinear([0, LAST], [m.l, w - m.r]);
+  const y = d3.scaleLinear([0, 16], [h - m.b, m.t]);
+  const line = d3.line().x((_, i) => x(i)).y((v) => y(v));
+  const area = d3.area().x((_, i) => x(i)).y0(y(0)).y1((v) => y(v));
+  const yr = (yy) => MONTHS.indexOf(`${yy}-01`);
+  document.getElementById("multiples").innerHTML = order.map((c, k) => {
+    const v = AI[c], last = v[LAST];
+    return `<figure class="sm ${k === 0 ? "focal" : ""}">
+      <div class="sm-name">${NAMES[c]}<span class="num">${v[GPT].toFixed(1)}% → ${last.toFixed(1)}%</span></div>
+      <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${NAMES[c]}: AI share rose from ${v[GPT].toFixed(1)}% in Nov 2022 to ${last.toFixed(1)}% in Sep 2026">
+        <path class="area" d="${area(v)}"/>
+        <line class="marker" x1="${x(GPT)}" x2="${x(GPT)}" y1="${y(16)}" y2="${y(0)}"/>
+        <path class="line" d="${line(v)}"/>
+        <text class="tick" x="${m.l - 6}" y="${y(0) + 4}" text-anchor="end">0</text>
+        <text class="tick" x="${m.l - 6}" y="${y(15) + 4}" text-anchor="end">15%</text>
+        <line x1="${m.l - 2}" x2="${m.l - 2}" y1="${y(0)}" y2="${y(15)}" stroke="var(--rule)"/>
+        ${[2019, 2021, 2023, 2025].map((yy) => `<text class="tick" x="${x(yr(yy))}" y="${h - 4}" text-anchor="middle">${yy}</text>`).join("")}
+        <circle class="end" cx="${x(LAST)}" cy="${y(last)}" r="3"/>
+        <text class="end-lbl" x="${x(LAST) + 6}" y="${y(last) + 4}">${last.toFixed(1)}%</text>
+      </svg>
+    </figure>`;
+  }).join("");
+}
+
+/* ---------- Fig. 3 table ---------- */
+function drawTable() {
+  const IDX = D.idx, start = MONTHS.indexOf("2020-02");
+  const sx = d3.scaleLinear([start, LAST], [2, 118]);
+  const sy = d3.scaleLinear([60, 210], [24, 2]);
+  const spark = (c) => {
+    const pts = IDX[c].map((v, i) => [i, v]).filter(([i, v]) => i >= start && v != null);
+    const [li, lv] = pts[pts.length - 1];
+    return `<svg class="spark" viewBox="0 0 124 26" width="124" height="26" aria-hidden="true"><polyline points="${pts.map(([i, v]) => `${sx(i).toFixed(1)},${sy(v).toFixed(1)}`).join(" ")}"/><circle cx="${sx(li)}" cy="${sy(lv)}" r="2"/></svg>`;
+  };
+  const rows = Object.keys(AI).map((c) => {
+    const before = AI[c][GPT] * IDX[c][GPT], after = AI[c][LAST] * IDX[c][LAST];
+    return { c, s0: AI[c][GPT], s1: AI[c][LAST], idx: IDX[c][LAST], chg: after / before };
+  }).sort((a, b) => b.chg - a.chg);
+  const ratio = (x) => x >= 1.25 ? `×${x.toFixed(1)}` : `${x >= 1 ? "+" : ""}${Math.round((x - 1) * 100)}%`;
+  const html = rows.map((d, i) => `<tr class="${i === 0 ? "top" : ""}">
+      <td>${NAMES[d.c]}</td><td>${d.s0.toFixed(1)}%</td><td>${d.s1.toFixed(1)}%</td>
+      <td>${Math.round(d.idx)}</td><td class="spark-cell">${spark(d.c)}</td><td class="big">${ratio(d.chg)}</td></tr>`).join("")
+    + `<tr><td>Spain</td><td class="muted">n/a</td><td class="muted">n/a</td><td>${Math.round(IDX.ES[LAST])}</td><td class="spark-cell">${spark("ES")}</td><td class="muted">n/a</td></tr>`;
+  document.getElementById("est").innerHTML = html;
+}
+
+/* ---------- Fig. 4 employer x country matrix ---------- */
+const CO_ORDER = ["IE", "GB", "DE", "IT", "FR", "NL", "ES"];
+const FOCAL_CO = "Accenture";
+const esc = (s) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+function drawMatrix() {
+  document.getElementById("matrix-head").innerHTML =
+    `<th>Employer</th>${CO_ORDER.map((c) => `<th>${c === "GB" ? "UK" : c}</th>`).join("")}<th style="text-align:right">Total</th>`;
+  const max = d3.max(CO.acrossCountries, (r) => d3.max(Object.values(r.byCountry)));
+  const shade = d3.scaleSequential(d3.interpolateLab(css("--seq-lo"), css("--seq-hi"))).domain([0, max]);
+  document.getElementById("matrix").innerHTML = CO.acrossCountries.map((r) => {
+    const cells = CO_ORDER.map((c) => {
+      const n = r.byCountry[c] || 0;
+      if (!n) return `<td class="zero">·</td>`;
+      const bg = shade(n);
+      return `<td style="background:${bg};color:${inkFor(bg)}" title="${esc(r.name)}, ${NAMES[c]}: ${n} roles">${n}</td>`;
+    }).join("");
+    return `<tr class="${r.name === FOCAL_CO ? "focal" : ""}"><td>${esc(r.name)}</td>${cells}<td class="total">${r.total}</td></tr>`;
+  }).join("");
+}
+
+/* ---------- Fig. 5 top employers per country ---------- */
+function drawTops() {
+  const max = d3.max(CO_ORDER, (c) => CO.countries[c].top[0][1]);
+  document.getElementById("tops").innerHTML = CO_ORDER.map((c) => {
+    const d = CO.countries[c];
+    const rows = d.top.slice(0, 6).map(([name, n]) => `<div class="top-row ${name === FOCAL_CO ? "focal" : ""}">
+        <span class="name" title="${esc(name)}">${esc(name)}</span>
+        <span class="track"><span class="fill" style="display:block;width:${(n / max * 100).toFixed(1)}%"></span></span>
+        <span class="n">${n}</span></div>`).join("");
+    return `<div class="top-panel"><div class="top-head"><b>${NAMES[c]}</b><span>${d.roles} roles · ${Math.round(d.consultingShare * 100)}% consulting</span></div>${rows}</div>`;
+  }).join("");
+}
+
+function drawAll() { makeScale(); drawKey(); drawMap(); drawMultiples(); drawTable(); drawMatrix(); drawTops(); }
+drawAll();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
