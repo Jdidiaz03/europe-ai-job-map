@@ -52,7 +52,8 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 56px 80px;
 }
-.page { max-width: 1060px; margin: 0 auto; display: grid; gap: 56px; }
+.page { max-width: 1060px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; }
+.page > *, .with-note > *, figure { min-width: 0; }
 .col { max-width: 660px; }
 .with-note { display: grid; grid-template-columns: minmax(0, 660px) minmax(0, 300px); gap: 48px; align-items: start; }
 .note { font: 400 14px/1.5 var(--serif); color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 10px; }
